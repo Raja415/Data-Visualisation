@@ -1,0 +1,101 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+%matplotlib inline
+
+haberman = pd.read_csv('haberman.csv')
+# head of the data
+haberman.head()
+
+haberman = pd.read_csv('haberman.csv', header=None)
+# now check the head of the data
+haberman.head()
+
+# specifying column names at the time of loading data set
+# haberman = pd.read_csv('haberman.csv', header=None, names=['Age', 'Year', 'Positive_Axillary_Nodes', 'Survival_Status'])
+
+sns.pairplot(haberman)
+
+count_classes = pd.value_counts(haberman["Survival_Status"])
+count_classes.plot(kind = 'bar')
+plt.title("Class distribution Histogram")
+plt.xlabel("Survival Status")
+plt.ylabel("Frequency")
+plt.show()
+
+haberman.describe(include='all')
+haberman['Survival_Status'].describe()
+
+# Univariate analysis - plotting distribution
+sns.FacetGrid(haberman, hue="Survival_Status", size=5) \
+      .map(sns.distplot, "Age") \
+      .add_legend();
+plt.figure(figsize=(20,5))
+for idx, feature in enumerate(list(haberman.columns)[:-1]):
+    
+    plt.subplot(1, 3, idx+1)
+    print("********* "+feature+" *********")
+    
+    counts, bin_edges = 
+              np.histogram(haberman[feature], bins=10, density=True)
+    print("Bin Edges: {}".format(bin_edges))
+    pdf = counts/sum(counts)
+    print("PDF: {}".format(pdf))
+    cdf = np.cumsum(pdf)
+    print("CDF: {}".format(cdf))
+
+survived = haberman[haberman['Survival_Status'] == 'Yes']
+notsurvived = haberman[haberman['Survival_Status'] == 'No']
+
+# Compute ECDF for Postive_Axillary_Nodes data: x_vers, y_vers
+x_vers, y_vers = ecdf(haberman['Positive_Axillary_Nodes'])
+# Generate plot
+plt.plot(x_vers, y_vers, marker='.', linestyle='none')
+# Label the axes
+plt.xlabel('Positive_Axillary_Nodes')
+plt.ylabel('ECDF')
+# Display the plot
+plt.show()
+
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+for idx, feature in enumerate(list(haberman.columns)[:-1]):
+    sns.stripplot( x='Survival_Status', y=feature, 
+                   data=haberman, ax=axes[idx], jitter=True)
+plt.show()
+    
+    plt.plot(bin_edges[1:], pdf, bin_edges[1:], cdf)
+    plt.xlabel(feature)
+
+sns.FacetGrid(haberman, hue="Survival_Status", size=4) \
+   .map(plt.scatter, "Age", "Positive_Axillary_Nodes") \
+   .add_legend();
+plt.show();
+
+# plotting distribution plot for all features
+for idx, feature in enumerate(list(haberman.columns)[:-1]):
+    fg = sns.FacetGrid(haberman, hue='Survival_Status', size=5)
+    fg.map(sns.distplot, feature).add_legend()
+    plt.show()
+
+sns.pairplot(haberman, hue = 'Survival_Status', size = 3)
+plt.show()
+
+print(list(haberman['Survival_Status'].unique()))
+Output:
+['Yes', 'No']
+
+print(list(haberman['Survival_Status'].unique()))
+Output:
+[1, 0]
+
+haberman["Survival_Status"].value_counts()
+Output:
+1    225
+0     81
+Name: Survival_Status, dtype: int64
+
+sns.heatmap(haberman.corr(), annot = True)
+haberman.corr()['Survival_Status'] # numerical correlation matrix
+
+plt.show();
